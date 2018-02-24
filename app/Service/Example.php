@@ -8,9 +8,9 @@ class Example
 
     protected $youtube;
 
-    public function __construct()
+    public function __construct(Google $google)
     {
-        $this->youtube = new \Google_Service_YouTube(Google::getClient());
+        $this->youtube = new \Google_Service_YouTube($google->getClient());
     }
 
     public function getList()

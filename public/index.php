@@ -3,7 +3,8 @@
 require_once __DIR__ . '/../app/Defines.php';
 require_once ROOT . '/vendor/autoload.php';
 
-use App\Core\Application;
+$builder = new \DI\ContainerBuilder();
+$container = $builder->build();
 
-$app = new Application();
+$app = $container->get('App\Core\Application');
 $app->run();

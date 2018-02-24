@@ -12,9 +12,9 @@ class Router
 
     /**
      * Router constructor.
-     * @param $request
+     * @param Request $request
      */
-    public function __construct($request)
+    public function __construct(Request $request)
     {
         $this->request = $request;
         @list($this->controller, $this->action) = explode('@', $this->getRoute(), 2);
