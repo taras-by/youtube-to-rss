@@ -3,31 +3,15 @@ version: '2'
 services:
 
   app:
-    container_name: skeleton.app
+    container_name: youtube-to-rss.app
     build: docker/php
     volumes:
       - .:/var/www
 
   nginx:
-    container_name: skeleton.nginx
+    container_name: youtube-to-rss.nginx
     build: docker/nginx
     volumes_from:
       - app
     ports:
       - 835:80
-
-  db:
-    container_name: skeleton.mysql
-    image: mysql
-    volumes:
-      - ./docker/mysql/.db:/var/lib/mysql
-    env_file:
-      - ./docker/mysql/env
-    ports:
-        - 850:3306
-
-  phpmyadmin:
-    container_name: skeleton.phpmyadmin
-    image: phpmyadmin/phpmyadmin
-    ports:
-        - 864:80

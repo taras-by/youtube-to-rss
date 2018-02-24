@@ -1,0 +1,9 @@
+<?php
+
+namespace App;
+
+class Config
+{
+    const GOOGLE_APPLICATION_NAME = 'ApplicationName';
+    const GOOGLE_DEVELOPER_KEY = 'DeveloperKey';
+}

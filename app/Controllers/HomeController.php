@@ -1,17 +1,15 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\Post;
 
-/**
- * Class HomeController
- * @package App\Controllers
- */
+use App\Core\Response;
+use App\Service\Example;
+
 class HomeController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
-        $posts = (new Post())->getAll();
-        return $this->response->render('home.index', compact('posts'));
+        $items = (new Example())->getList();
+        return $this->response->render('home.index', compact('items'));
     }
 }

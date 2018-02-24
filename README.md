@@ -2,11 +2,14 @@
 
 Installation, build/run containers:
 
-    $ git clone git@github.com:taras-by/php-skeleton.git
-    $ cd php-skeleton
+    $ git clone git@github.com:taras-by/youtube-to-rss.git
+    $ cd youtube-to-rss
+    $ cp app/Config.php.dist app/Config.php
     $ docker-compose build
     $ docker-compose up -d 
     $ ./docker/console composer install
+    
+Edit config file: `app/Config.php`
 
-Run application: http://localhost:835
+Run application: `http://localhost:835`
     

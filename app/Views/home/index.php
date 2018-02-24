@@ -1,8 +1,12 @@
 <?php
-$meta_title = 'Welcome!';
+$meta_title = 'Thumbnails';
 ?>
-    <h1>Posts</h1>
+    <h1>Thumbnails</h1>
 
-<?php foreach ($posts as $post) : ?>
-    <p><small><?= $post->date ?></small> <?= $post->title ?></p>
+<?php foreach ($items as $item) : ?>
+
+    <?php if (isset($item->snippet->thumbnails->default)) : ?>
+        <img src="<?php echo $item->snippet->thumbnails->default->url ?>"/>
+    <?php endif; ?>
+
 <?php endforeach; ?>
