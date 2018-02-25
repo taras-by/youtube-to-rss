@@ -12,4 +12,11 @@ class HomeController
         $items = $example->getList();
         return $response->render('home.index', compact('items'));
     }
+
+    public function feed(Example $example, Response $response): Response
+    {
+        $feed = $example->getFeed();
+        return $response->view($feed)
+            ->setHeader('Content-Type: text/xml');
+    }
 }

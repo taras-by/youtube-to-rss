@@ -11,7 +11,8 @@
   "require": {
     "php": ">=7.2.0",
     "google/apiclient": "^2.0",
-    "php-di/php-di": "^6.0"
+    "php-di/php-di": "^6.0",
+    "suin/php-rss-writer": "^1.6"
   },
   "autoload": {
     "psr-4": {
