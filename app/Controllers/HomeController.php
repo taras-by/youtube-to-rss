@@ -2,20 +2,15 @@
 
 namespace App\Controllers;
 
+use App\Core\Request;
 use App\Core\Response;
-use App\Service\Example;
+use App\Services\Playlist;
 
 class HomeController
 {
-    public function index(Example $example, Response $response): Response
+    public function playlist(Playlist $playList, Response $response, Request $request): Response
     {
-        $items = $example->getList();
-        return $response->render('home.index', compact('items'));
-    }
-
-    public function feed(Example $example, Response $response): Response
-    {
-        $feed = $example->getFeed();
+        $feed = $playList->getFeed($request->get['id']);
         return $response->view($feed)
             ->setHeader('Content-Type: text/xml');
     }

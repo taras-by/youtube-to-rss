@@ -13,8 +13,7 @@ class Route
     public static function rules()
     {
         return [
-            '/page' => 'HomeController@index',
-            '/feed.xml' => 'HomeController@feed',
+            '/playlist.xml' => 'HomeController@playlist',
         ];
     }
 }
