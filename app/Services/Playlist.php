@@ -72,7 +72,7 @@ class Playlist
                 ->url(YoutubeHelper::getVideoUrl($id))
                 ->description(RssHelper::getDescriptionWithImage(
                     $video->snippet->description,
-                    $video->snippet->thumbnails->standard->url
+                    $video->snippet->thumbnails->standard->url ?? null
                 ))
                 ->enclosure(Router::url('video', ['id' => $id]), null, 'video/mpeg')
                 ->appendTo($channel);
