@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Core\Router;
 use Suin\RSSWriter\Channel;
 use Suin\RSSWriter\Feed;
 use Suin\RSSWriter\Item;
@@ -39,6 +40,7 @@ class Playlist
         ]);
         return $items;
     }
+
     private function getList(string $id)
     {
         $items = $this->youtube->playlists->listPlaylists('snippet,contentDetails', [
@@ -63,12 +65,17 @@ class Playlist
 
             $item = new Item();
 
-            $item->url(YoutubeHelper::getVideoUrl($video->contentDetails->videoId));
+            $id= $video->contentDetails->videoId;
 
-            $item->title($video->snippet->title);
-            $item->description($video->snippet->description);
-
-            $item->appendTo($channel);
+            $item
+                ->title($video->snippet->title)
+                ->url(YoutubeHelper::getVideoUrl($id))
+                ->description(RssHelper::getDescriptionWithImage(
+                    $video->snippet->description,
+                    $video->snippet->thumbnails->standard->url
+                ))
+                ->enclosure(Router::url('video', ['id' => $id]), null, 'video/mpeg')
+                ->appendTo($channel);
         }
     }
 }

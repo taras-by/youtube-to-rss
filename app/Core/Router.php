@@ -55,4 +55,17 @@ class Router
             throw new \Exception();
         }
     }
+
+    /**
+     * @param string $path
+     * @param array $parameters
+     * @return string
+     */
+    static public function url(string $path, array $parameters = []): string
+    {
+        return $_SERVER['REQUEST_SCHEME'] .
+            '://' . $_SERVER['HTTP_HOST'] .
+            '/' . $path .
+            ($parameters ? '?' . http_build_query($parameters) : '');
+    }
 }

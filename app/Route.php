@@ -14,6 +14,7 @@ class Route
     {
         return [
             '/playlist.xml' => 'HomeController@playlist',
+            '/video' => 'HomeController@video',
         ];
     }
 }
