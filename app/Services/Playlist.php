@@ -59,13 +59,13 @@ class Playlist
             ->url(YoutubeHelper::getPlayListUrl($list->id));
     }
 
-    private function appendItems($channel, $list)
+    private function appendItems($channel, $list): void
     {
         foreach ($list as $video) {
 
             $item = new Item();
 
-            $id= $video->contentDetails->videoId;
+            $id = $video->contentDetails->videoId;
 
             $item
                 ->title($video->snippet->title)
@@ -74,6 +74,7 @@ class Playlist
                     $video->snippet->description,
                     $video->snippet->thumbnails->standard->url ?? null
                 ))
+                ->pubDate(strtotime($video->contentDetails->videoPublishedAt))
                 ->enclosure(Router::url('video', ['id' => $id]), null, 'video/mpeg')
                 ->appendTo($channel);
         }
