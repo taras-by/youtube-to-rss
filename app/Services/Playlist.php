@@ -59,7 +59,7 @@ class Playlist
             ->url(YoutubeHelper::getPlayListUrl($list->id));
     }
 
-    private function appendItems($channel, $list): void
+    private function appendItems($channel, $list)
     {
         foreach ($list as $video) {
 
