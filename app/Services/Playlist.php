@@ -74,7 +74,7 @@ class Playlist
                     $video->snippet->description,
                     $video->snippet->thumbnails->standard->url ?? null
                 ))
-                ->pubDate(strtotime($video->contentDetails->videoPublishedAt))
+                ->pubDate(strtotime($video->snippet->publishedAt))
                 ->enclosure(Router::url('video', ['id' => $id]), null, 'video/mpeg')
                 ->appendTo($channel);
         }
