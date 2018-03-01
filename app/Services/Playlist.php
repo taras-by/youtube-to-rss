@@ -32,7 +32,7 @@ class Playlist
         return $feed;
     }
 
-    private function getItems(string $id)
+    public function getItems(string $id)
     {
         $items = $this->youtube->playlistItems->listPlaylistItems('snippet,contentDetails', [
             'playlistId' => $id,

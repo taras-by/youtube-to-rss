@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Core\Request;
 use App\Core\Response;
 use App\Services\Playlist;
-use App\Services\VideoStream;
+use App\Services\VideoInfo;
 
 class HomeController
 {
@@ -25,9 +25,18 @@ class HomeController
             ->setHeader('Content-Type: text/xml');
     }
 
-    public function video(VideoStream $video): Response
+    public function video(): Response
     {
-        $url = $video->getLink($this->request->get['id']);
-        return $this->response->setHeader(header('Location: ' . $url));
+        $videoInfo = new VideoInfo($this->request->get['id']);
+
+        try {
+            $url = $videoInfo->getLink();
+            return $this->response
+                ->setHeader(header('Location: ' . $url));
+        } catch (\RuntimeException $exception) {
+            return $this->response
+                ->view($exception->getMessage())
+                ->setHeader(header('HTTP/1.1 406 Not Acceptable'));
+        }
     }
 }
