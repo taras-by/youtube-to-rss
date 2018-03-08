@@ -47,7 +47,7 @@ class Rss
          */
         foreach ($this->items as $rssItem) {
             $item = $this->rss->addChild('item');
-            $item->addChild('title', $rssItem->getTitle());
+            $item->addChild('title', htmlspecialchars($rssItem->getTitle()));
             $item->addChild('description', htmlspecialchars($rssItem->getDescription()));
             $item->addChild('link', $rssItem->getLink());
             $item->addChild('guid', $rssItem->getGuid());
