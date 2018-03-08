@@ -29,7 +29,7 @@ class Rss
             '/>');
     }
 
-    private function build(): void
+    private function build()
     {
         $this->rss->addAttribute('version', '2.0');
 
