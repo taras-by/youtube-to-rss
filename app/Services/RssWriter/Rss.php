@@ -46,13 +46,17 @@ class Rss
          * @var $rssItem RssItem
          */
         foreach ($this->items as $rssItem) {
-            $item = $this->rss->addChild('item');
+            $item = $channel->addChild('item');
             $item->addChild('title', htmlspecialchars($rssItem->getTitle()));
             $item->addChild('description', htmlspecialchars($rssItem->getDescription()));
             $item->addChild('link', $rssItem->getLink());
             $item->addChild('guid', $rssItem->getGuid());
             $item->addChild('pubDate', $rssItem->getPubDate()->format(\DateTime::RSS));
-            $item->addChild('enclosure', $rssItem->getEnclosure());
+
+            $enclosure = $item->addChild('enclosure');
+            $enclosure->addAttribute('url',$rssItem->getEnclosure());
+            $enclosure->addAttribute('type','video/mpeg');
+
             $item->addChild('itunes:image', null, self::NAMESPACE_ITUNES)
                 ->addAttribute('href', $rssItem->getImage());
         }
