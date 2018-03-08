@@ -36,7 +36,8 @@ class Playlist extends FeedAbstract
 
             $videoId = $video->contentDetails->videoId;
             $link = YoutubeHelper::getVideoUrl($videoId);
-            $image = $video->snippet->thumbnails->default->url;
+            $image = $video->snippet->thumbnails->standard->url ??
+                $video->snippet->thumbnails->default->url;
 
             $item = new RssItem();
             $item->setTitle($video->snippet->title)
