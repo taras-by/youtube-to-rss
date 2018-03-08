@@ -1,0 +1,71 @@
+<?php
+
+namespace App\Services\FeedBuilder;
+
+use App\Core\Router;
+use App\Services\Youtube\Google;
+use App\Services\RssWriter\RssChannel;
+use App\Services\RssWriter\RssHelper;
+use App\Services\RssWriter\RssItem;
+use App\Services\Youtube\YoutubeHelper;
+
+/**
+ * https://developers.google.com/youtube/v3/docs/playlistItems
+ */
+class Playlist extends FeedAbstract
+{
+    const MAX_RESULTS = 50;
+    const PLAYLIST_IMAGE = 'images/youtube.png';
+
+    protected $youtube;
+
+    public function __construct(Google $google)
+    {
+        $this->youtube = new \Google_Service_YouTube($google->getClient());
+    }
+
+    protected function getItems(string $id): array
+    {
+        $playlistItems = $this->youtube->playlistItems->listPlaylistItems('snippet,contentDetails', [
+            'playlistId' => $id,
+            'maxResults' => self::MAX_RESULTS
+        ]);
+        $items = [];
+
+        foreach ($playlistItems as $video) {
+
+            $videoId = $video->contentDetails->videoId;
+            $link = YoutubeHelper::getVideoUrl($videoId);
+
+            $item = new RssItem();
+            $item->setTitle($video->snippet->title)
+                ->setLink($link)
+                ->setGuid($link)
+                ->setDescription(RssHelper::getDescriptionWithImage(
+                    $video->snippet->description,
+                    $video->snippet->thumbnails->standard->url ?? null
+                ))
+                ->setPubDate(new \DateTime($video->snippet->publishedAt))
+                ->setEnclosure(Router::url('video', ['id' => $videoId]))
+                ->setImage($video->snippet->thumbnails->default->url);
+
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    protected function getChannel(string $id): RssChannel
+    {
+        $items = $this->youtube->playlists->listPlaylists('snippet,contentDetails', [
+            'id' => $id
+        ]);
+        $list = $items[0];
+
+        $channel = new RssChannel();
+        return $channel->setTitle($list->snippet->title)
+            ->setDescription($list->snippet->description)
+            ->setLink(YoutubeHelper::getPlayListUrl($list->id))
+            ->setImage(Router::url(self::PLAYLIST_IMAGE));
+    }
+}

@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Core\Response;
-use App\Services\Playlist;
-use App\Services\VideoInfo;
+use App\Services\FeedBuilder\Playlist;
+use App\Services\Youtube\VideoInfo;
 
 class HomeController
 {

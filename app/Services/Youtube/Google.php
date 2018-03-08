@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Youtube;
 
 use App\Config;
 use \Google_Client as googleClient;
