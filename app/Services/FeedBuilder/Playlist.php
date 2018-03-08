@@ -36,6 +36,7 @@ class Playlist extends FeedAbstract
 
             $videoId = $video->contentDetails->videoId;
             $link = YoutubeHelper::getVideoUrl($videoId);
+            $image = $video->snippet->thumbnails->default->url;
 
             $item = new RssItem();
             $item->setTitle($video->snippet->title)
@@ -43,11 +44,11 @@ class Playlist extends FeedAbstract
                 ->setGuid($link)
                 ->setDescription(RssHelper::getDescriptionWithImage(
                     $video->snippet->description,
-                    $video->snippet->thumbnails->standard->url ?? null
+                    $image
                 ))
                 ->setPubDate(new \DateTime($video->snippet->publishedAt))
                 ->setEnclosure(Router::url('video', ['id' => $videoId]))
-                ->setImage($video->snippet->thumbnails->default->url);
+                ->setImage($image);
 
             $items[] = $item;
         }

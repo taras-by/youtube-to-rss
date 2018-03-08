@@ -39,8 +39,11 @@ class Rss
         $channel->addChild('link', $this->channel->getLink());
 
         $channel->addChild('image')
-            ->addChild('link')
             ->addChild('url', $this->channel->getImage());
+
+        $itunesImage = $channel->addChild('itunes:image', null, self::NAMESPACE_ITUNES);
+        $itunesImage->addAttribute('href', $this->channel->getImage());
+        $itunesImage->addChild( 'url', $this->channel->getImage());
 
         /**
          * @var $rssItem RssItem
