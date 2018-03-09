@@ -11,12 +11,11 @@ use App\Services\Youtube\YoutubeHelper;
 
 /**
  * https://developers.google.com/youtube/v3/docs/channels/list
- * https://developers.google.com/youtube/v3/docs/playlistItems
+ * https://developers.google.com/youtube/v3/docs/search/list
  */
-class Playlist extends FeedAbstract
+class Channel extends FeedAbstract
 {
     const MAX_RESULTS = 50;
-    const PLAYLIST_IMAGE = 'images/youtube.png';
 
     protected $youtube;
 
@@ -27,15 +26,17 @@ class Playlist extends FeedAbstract
 
     protected function getItems(string $id): array
     {
-        $playlistItems = $this->youtube->playlistItems->listPlaylistItems('snippet', [
-            'playlistId' => $id,
+        $listSearch = $this->youtube->search->listSearch('snippet', [
+            'channelId' => $id,
+            'order' => 'date',
+            'type' => 'video',
             'maxResults' => self::MAX_RESULTS
         ]);
         $items = [];
 
-        foreach ($playlistItems as $video) {
+        foreach ($listSearch as $video) {
 
-            $videoId = $video->snippet->resourceId->videoId;
+            $videoId = $video->id->videoId;
             $link = YoutubeHelper::getVideoUrl($videoId);
             $image = $video->snippet->thumbnails->standard->url ??
                 $video->snippet->thumbnails->default->url;
@@ -60,15 +61,19 @@ class Playlist extends FeedAbstract
 
     protected function getChannel(string $id): RssChannel
     {
-        $items = $this->youtube->playlists->listPlaylists('snippet', [
+        $items = $this->youtube->channels->listChannels('snippet', [
             'id' => $id
         ]);
-        $list = $items[0];
+        $channel = $items[0];
 
-        $channel = new RssChannel();
-        return $channel->setTitle($list->snippet->title)
-            ->setDescription($list->snippet->description)
-            ->setLink(YoutubeHelper::getPlayListUrl($list->id))
-            ->setImage(Router::url(self::PLAYLIST_IMAGE));
+        $rssChannel = new RssChannel();
+        return $rssChannel->setTitle($channel->snippet->title)
+            ->setDescription($channel->snippet->description)
+            ->setLink(YoutubeHelper::getPlayListUrl($channel->id))
+            ->setImage(
+                $channel->snippet->thumbnails->high->url ??
+                $channel->snippet->thumbnails->medium->url ??
+                $channel->snippet->thumbnails->default->url
+            );
     }
 }

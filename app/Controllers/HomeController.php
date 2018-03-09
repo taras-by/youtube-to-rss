@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Request;
 use App\Core\Response;
+use App\Services\FeedBuilder\Channel;
 use App\Services\FeedBuilder\Playlist;
 use App\Services\Youtube\VideoInfo;
 
@@ -16,6 +17,13 @@ class HomeController
     {
         $this->response = $response;
         $this->request = $request;
+    }
+
+    public function channel(Channel $channel): Response
+    {
+        $feed = $channel->getFeed($this->request->get['id']);
+        return $this->response->view($feed)
+            ->setHeader('Content-Type: text/xml');
     }
 
     public function playlist(Playlist $playList): Response
