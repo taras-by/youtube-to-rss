@@ -38,14 +38,8 @@ class Rss
         $channel->addChild('description', $this->channel->getDescription());
         $channel->addChild('link', $this->channel->getLink());
 
-        $channel->addChild('image')
-            ->addChild('url', $this->channel->getImage());
-
-        $channel->addChild('itunes:explicit', 'no', self::NAMESPACE_ITUNES);
-
-        $itunesImage = $channel->addChild('itunes:image', null, self::NAMESPACE_ITUNES);
-        $itunesImage->addAttribute('href', $this->channel->getImage());
-        $itunesImage->addChild( 'url', $this->channel->getImage());
+        $channel->addChild('itunes:image', null, self::NAMESPACE_ITUNES)
+            ->addAttribute('href', $this->channel->getImage());
 
         /**
          * @var $rssItem RssItem
@@ -61,8 +55,6 @@ class Rss
             $enclosure = $item->addChild('enclosure');
             $enclosure->addAttribute('url',$rssItem->getEnclosure());
             $enclosure->addAttribute('type','video/mpeg');
-
-            $item->addChild('itunes:explicit', 'no', self::NAMESPACE_ITUNES);
 
             $item->addChild('itunes:image', null, self::NAMESPACE_ITUNES)
                 ->addAttribute('href', $rssItem->getImage());
