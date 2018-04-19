@@ -36,24 +36,27 @@ class Channel extends FeedAbstract
 
         foreach ($listSearch as $video) {
 
-            $videoId = $video->id->videoId;
-            $link = YoutubeHelper::getVideoUrl($videoId);
-            $image = $video->snippet->thumbnails->standard->url ??
-                $video->snippet->thumbnails->default->url;
+            if($video->snippet->thumbnails){
 
-            $item = new RssItem();
-            $item->setTitle($video->snippet->title)
-                ->setLink($link)
-                ->setGuid($link)
-                ->setDescription(RssHelper::getDescriptionWithImage(
-                    $video->snippet->description,
-                    $image
-                ))
-                ->setPubDate(new \DateTime($video->snippet->publishedAt))
-                ->setEnclosure(Router::url('video', ['id' => $videoId]))
-                ->setImage($image);
+                $videoId = $video->id->videoId;
+                $link = YoutubeHelper::getVideoUrl($videoId);
+                $image = $video->snippet->thumbnails->standard->url ??
+                    $video->snippet->thumbnails->default->url;
 
-            $items[] = $item;
+                $item = new RssItem();
+                $item->setTitle($video->snippet->title)
+                    ->setLink($link)
+                    ->setGuid($link)
+                    ->setDescription(RssHelper::getDescriptionWithImage(
+                        $video->snippet->description,
+                        $image
+                    ))
+                    ->setPubDate(new \DateTime($video->snippet->publishedAt))
+                    ->setEnclosure(Router::url('video', ['id' => $videoId]))
+                    ->setImage($image);
+
+                $items[] = $item;
+            }
         }
 
         return $items;
