@@ -4,7 +4,7 @@ namespace App\Services\Youtube;
 
 class VideoInfo
 {
-    const API_URL = 'http://www.youtube.com/get_video_info?video_id=%s';
+    const API_URL = 'https://www.youtube.com/get_video_info?video_id=%s';
 
     const QUALITY_HD720 = 'hd720';
     const QUALITY_MEDIUM = 'medium';
