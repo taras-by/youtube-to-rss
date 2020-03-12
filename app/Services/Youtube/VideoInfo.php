@@ -24,7 +24,13 @@ class VideoInfo
         $this->decipher = new SignatureDecipher($id);
     }
 
-    public function getInfo(): array
+    public function getLink(string $quality = self::QUALITY_MEDIUM): string
+    {
+        $format = $this->getFormatByQuality($quality);
+        return $format->url;
+    }
+
+    private function getInfo(): array
     {
         if (is_null($this->info)) {
 
@@ -44,44 +50,32 @@ class VideoInfo
         return $this->info;
     }
 
-    public function getStreams(): array
+    private function getFormats(): array
     {
-        $streams = [];
         $info = $this->getInfo();
-        $streamMap = explode(',', $info['url_encoded_fmt_stream_map']);
-        foreach ($streamMap as $streamString) {
-            parse_str($streamString, $stream);
-            $streams[] = $stream;
+
+        if (!isset($info["player_response"])) {
+            throw new \RuntimeException('player_response not found');
         }
-        return $streams;
+
+        $playerResponse = json_decode($info["player_response"]);
+
+        return $playerResponse->streamingData->formats;
     }
 
-    public function getStreamByQuality(string $quality): array
+    private function getFormatByQuality(string $quality): \stdClass
     {
         $result = null;
 
-        foreach ($this->getStreams() as $stream) {
-
-            if ($stream['quality'] == $quality and strripos($stream['type'], self::FORMAT_DEFAULT)) {
-                $result = $stream;
+        foreach ($this->getFormats() as $format) {
+            if ($format->quality == $quality and strripos($format->mimeType, self::FORMAT_DEFAULT)) {
+                $result = $format;
                 break;
-            } elseif ($stream['quality'] == self::QUALITY_MEDIUM) {
-                $result = $stream;
+            } elseif ($format->quality == self::QUALITY_MEDIUM) {
+                $result = $format;
             }
         }
 
         return $result;
-    }
-
-    public function getLink(string $quality = self::QUALITY_MEDIUM): string
-    {
-        $stream = $this->getStreamByQuality($quality);
-
-        $url = $stream['url'];
-
-        if (isset($stream['s'])) {
-            $url .= '&signature=' . $this->decipher->getSignature($stream['s']);
-        }
-        return $url;
     }
 }
