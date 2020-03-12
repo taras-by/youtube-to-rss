@@ -72,8 +72,9 @@ class VideoInfo
     private function getFormatByQuality(string $quality): \stdClass
     {
         $result = null;
+        $formats = $this->getFormats();
 
-        foreach ($this->getFormats() as $format) {
+        foreach ($formats as $format) {
             if ($format->quality == $quality and strripos($format->mimeType, self::FORMAT_DEFAULT)) {
                 $result = $format;
                 break;
@@ -81,6 +82,8 @@ class VideoInfo
                 $result = $format;
             }
         }
+
+        $result = $result ? $result : $formats[0] ?? null;
 
         return $result;
     }
