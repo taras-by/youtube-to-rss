@@ -14,6 +14,8 @@ class VideoInfo
     const FORMAT_DEFAULT = 'mp4';
     const STATUS_DEFAULT = 'fail';
 
+    const PLAYBILITY_STATUS_UNPLAYABLE = 'UNPLAYABLE';
+
     private $id;
     private $info;
     private $decipher;
@@ -59,6 +61,10 @@ class VideoInfo
         }
 
         $playerResponse = json_decode($info["player_response"]);
+
+        if ($playerResponse->playabilityStatus->status == self::PLAYBILITY_STATUS_UNPLAYABLE) {
+            throw new \RuntimeException($playerResponse->playabilityStatus->reason);
+        }
 
         return $playerResponse->streamingData->formats;
     }
