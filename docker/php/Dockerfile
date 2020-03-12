@@ -11,7 +11,6 @@ RUN apt-get update \
 		wget \
 		curl \
 		git \
-		mysql-client \
 		moreutils \
 		dnsutils \
 		zlib1g-dev \
@@ -26,7 +25,7 @@ RUN composer --version
 
 # Run docker-php-ext-install for available extensions
 RUN docker-php-ext-configure intl \
-    && docker-php-ext-install pdo pdo_mysql opcache intl
+    && docker-php-ext-install opcache intl
 
 # install xdebug
 RUN pecl install xdebug
