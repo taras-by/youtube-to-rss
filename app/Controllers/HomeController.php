@@ -21,14 +21,32 @@ class HomeController
 
     public function channel(Channel $channel): Response
     {
-        $feed = $channel->getFeed($this->request->get['id']);
+        $channelId = $this->request->get['id'] ?? null;
+        if(!$channelId){
+            return $this->response->notFound();
+        }
+
+        $feed = $channel->getFeed($channelId);
+        if(!$feed){
+            return $this->response->notFound();
+        }
+
         return $this->response->view($feed)
             ->setHeader('Content-Type: text/xml');
     }
 
     public function playlist(Playlist $playList): Response
     {
-        $feed = $playList->getFeed($this->request->get['id']);
+        $playListId = $this->request->get['id'] ?? null;
+        if(!$playListId){
+            return $this->response->notFound();
+        }
+
+        $feed = $playList->getFeed($playListId);
+        if(!$feed){
+            return $this->response->notFound();
+        }
+
         return $this->response->view($feed)
             ->setHeader('Content-Type: text/xml');
     }

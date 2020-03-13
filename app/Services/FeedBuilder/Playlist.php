@@ -61,12 +61,16 @@ class Playlist extends FeedAbstract
         return $items;
     }
 
-    protected function getChannel(string $id): RssChannel
+    protected function getChannel(string $id): ?RssChannel
     {
         $items = $this->youtube->playlists->listPlaylists('snippet', [
             'id' => $id
         ]);
+
         $list = $items[0];
+        if(!$list->snippet){
+            return null;
+        }
 
         $channel = new RssChannel();
         return $channel->setTitle($list->snippet->title)
