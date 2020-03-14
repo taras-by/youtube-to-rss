@@ -13,12 +13,10 @@ class Application
 
     public function __construct(
         Container $container,
-        Request $request,
         Response $response,
         Router $router
     )
     {
-        $this->request = $request;
         $this->response = $response;
         $this->router = $router;
         $this->container = $container;

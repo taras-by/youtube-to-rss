@@ -1,6 +1,6 @@
 {
-  "name": "tarasby/php-skeleton",
-  "description": "Skeleton for MVC application",
+  "name": "taras-by/youtube-to-rss",
+  "description": "YouTube to RSS",
   "type": "project",
   "authors": [
     {
@@ -10,10 +10,11 @@
   ],
   "require": {
     "php": ">=7.2.0",
+    "ext-json": "*",
+    "ext-simplexml": "*",
     "google/apiclient": "^2.0",
     "php-di/php-di": "^6.0",
-    "ext-json": "*",
-    "ext-simplexml": "*"
+    "symfony/http-foundation": "^4.4"
   },
   "autoload": {
     "psr-4": {

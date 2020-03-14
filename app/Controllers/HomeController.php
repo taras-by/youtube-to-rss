@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Core\Request;
+use Symfony\Component\HttpFoundation\Request;
 use App\Core\Response;
 use App\Services\FeedBuilder\Channel;
 use App\Services\FeedBuilder\Playlist;
@@ -13,27 +13,25 @@ use App\Services\Youtube\VideoInfo;
 class HomeController
 {
     private $response;
-    private $request;
 
-    public function __construct(Response $response, Request $request)
+    public function __construct(Response $response)
     {
         $this->response = $response;
-        $this->request = $request;
     }
 
     public function index(LinkGenerator $generator)
     {
-        $youtubeLink = $this->request->post["youtube_link"] ?? null;
-        $submit = $this->request->post != null;
+        $request = $this->getRequest();
+        $youtubeLink = $request->get('youtube_link');
+        $submit = $request->isMethod(Request::METHOD_POST);
         $validator = new YoutubeLinkValidator($youtubeLink);
         $generatedUrl = null;
         $errorMessage = null;
-        if ($this->request->post && $validator->validate()) {
-            if(!$generatedUrl = $generator->generate($youtubeLink)){
+        if ($submit && $validator->validate()) {
+            if (!$generatedUrl = $generator->generate($youtubeLink)) {
                 $errorMessage = 'Error generating link';
             }
-        }
-        else{
+        } else {
             $errorMessage = $validator->getMessage();
         }
         return $this->response->render('index', compact('youtubeLink', 'generatedUrl', 'errorMessage', 'submit'));
@@ -41,7 +39,7 @@ class HomeController
 
     public function channel(Channel $channel): Response
     {
-        $channelId = $this->request->get['id'] ?? null;
+        $channelId = $this->getRequest()->get('id');
         if (!$channelId) {
             return $this->response->notFound();
         }
@@ -57,7 +55,7 @@ class HomeController
 
     public function playlist(Playlist $playList): Response
     {
-        $playListId = $this->request->get['id'] ?? null;
+        $playListId = $this->getRequest()->get('id');
         if (!$playListId) {
             return $this->response->notFound();
         }
@@ -73,7 +71,8 @@ class HomeController
 
     public function video(): Response
     {
-        $videoInfo = new VideoInfo($this->request->get['id']);
+        $id = $this->getRequest()->get('id');
+        $videoInfo = new VideoInfo($id);
 
         try {
             $url = $videoInfo->getLink();
@@ -84,5 +83,10 @@ class HomeController
                 ->view($exception->getMessage())
                 ->setHeader(header('HTTP/1.1 406 Not Acceptable'));
         }
+    }
+
+    protected function getRequest(): Request
+    {
+        return Request::createFromGlobals();
     }
 }

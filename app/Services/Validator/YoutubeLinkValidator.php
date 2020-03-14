@@ -2,8 +2,6 @@
 
 namespace App\Services\Validator;
 
-use function DI\value;
-
 class YoutubeLinkValidator
 {
 
