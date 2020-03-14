@@ -62,11 +62,15 @@ class Channel extends FeedAbstract
         return $items;
     }
 
-    protected function getChannel(string $id): RssChannel
+    protected function getChannel(string $id): ?RssChannel
     {
         $items = $this->youtube->channels->listChannels('snippet', [
             'id' => $id
         ]);
+
+        if(!isset($items[0])){
+            return null;
+        }
         $channel = $items[0];
 
         $rssChannel = new RssChannel();
