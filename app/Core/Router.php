@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use App\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 class Router
 {
@@ -12,11 +13,10 @@ class Router
 
     /**
      * Router constructor.
-     * @param Request $request
      */
-    public function __construct(Request $request)
+    public function __construct()
     {
-        $this->request = $request;
+        $this->request = Request::createFromGlobals();
         @list($this->controller, $this->action) = explode('@', $this->getRoute(), 2);
     }
 
@@ -25,7 +25,7 @@ class Router
      */
     public function getRoute()
     {
-        return Route::rules()[$this->request->path] ?? null;
+        return Route::rules()[$this->request->getPathInfo()] ?? null;
     }
 
     /**
