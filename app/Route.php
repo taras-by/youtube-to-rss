@@ -11,6 +11,11 @@ class Route
         return [
 
             /**
+             * @see HomeController::index()
+             */
+            '/' => 'HomeController@index',
+
+            /**
              * @see HomeController::channel()
              */
             '/channel.xml' => 'HomeController@channel',

@@ -12,9 +12,9 @@ class VideoInfo
     const QUALITY_HD1080 = 'hd1080';
 
     const FORMAT_DEFAULT = 'mp4';
-    const STATUS_DEFAULT = 'fail';
+    const STATUS_OK = 'ok';
 
-    const PLAYBILITY_STATUS_UNPLAYABLE = 'UNPLAYABLE';
+    const PLAYBILITY_STATUS_OK = 'OK';
 
     private $id;
     private $info;
@@ -29,6 +29,11 @@ class VideoInfo
     public function getLink(string $quality = self::QUALITY_MEDIUM): string
     {
         $format = $this->getFormatByQuality($quality);
+
+        if (!isset($format->url)) {
+            throw new \RuntimeException('Format does not contain link to video');
+        }
+
         return $format->url;
     }
 
@@ -45,7 +50,7 @@ class VideoInfo
             parse_str($content, $this->info);
         }
 
-        if ($this->info['status'] == self::STATUS_DEFAULT) {
+        if ($this->info['status'] != self::STATUS_OK) {
             throw new \RuntimeException($this->info['reason']);
         }
 
@@ -62,8 +67,12 @@ class VideoInfo
 
         $playerResponse = json_decode($info["player_response"]);
 
-        if ($playerResponse->playabilityStatus->status == self::PLAYBILITY_STATUS_UNPLAYABLE) {
-            throw new \RuntimeException($playerResponse->playabilityStatus->reason);
+        if ($playerResponse->playabilityStatus->status != self::PLAYBILITY_STATUS_OK) {
+            throw new \RuntimeException($playerResponse->playabilityStatus->reason ?? 'Unknown reason');
+        }
+
+        if (!isset($playerResponse->streamingData->formats)) {
+            throw new \RuntimeException('Streaming data not contain video formats');
         }
 
         return $playerResponse->streamingData->formats;
@@ -83,7 +92,7 @@ class VideoInfo
             }
         }
 
-        $result = $result ? $result : $formats[0] ?? null;
+        $result = $result ? $result : $formats[0];
 
         return $result;
     }
