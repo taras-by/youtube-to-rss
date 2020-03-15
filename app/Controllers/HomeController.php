@@ -10,18 +10,10 @@ use App\Services\Generator\LinkGenerator;
 use App\Services\Validator\YoutubeLinkValidator;
 use App\Services\Youtube\VideoInfo;
 
-class HomeController
+class HomeController extends AbstractController
 {
-    private $response;
-
-    public function __construct(Response $response)
+    public function index(Request $request, LinkGenerator $generator)
     {
-        $this->response = $response;
-    }
-
-    public function index(LinkGenerator $generator)
-    {
-        $request = $this->getRequest();
         $youtubeLink = $request->get('youtube_link');
         $submit = $request->isMethod(Request::METHOD_POST);
         $validator = new YoutubeLinkValidator($youtubeLink);
@@ -34,59 +26,59 @@ class HomeController
         } else {
             $errorMessage = $validator->getMessage();
         }
-        return $this->response->render('index', compact('youtubeLink', 'generatedUrl', 'errorMessage', 'submit'));
+        return $this->getResponse()->render('index', compact('youtubeLink', 'generatedUrl', 'errorMessage', 'submit'));
     }
 
-    public function channel(Channel $channel): Response
+    public function channel(Request $request, Channel $channel): Response
     {
-        $channelId = $this->getRequest()->get('id');
+        $channelId = $request->get('id');
         if (!$channelId) {
-            return $this->response->notFound();
+            return $this->getResponse()->notFound();
         }
 
         $feed = $channel->getFeed($channelId);
         if (!$feed) {
-            return $this->response->notFound();
+            return $this->getResponse()->notFound();
         }
 
-        return $this->response->view($feed)
+        return $this->getResponse()->view($feed)
             ->setHeader('Content-Type: text/xml');
     }
 
-    public function playlist(Playlist $playList): Response
+    public function playlist(Request $request, Playlist $playList): Response
     {
-        $playListId = $this->getRequest()->get('id');
+        $playListId = $request->get('id');
         if (!$playListId) {
-            return $this->response->notFound();
+            return $this->getResponse()->notFound();
         }
 
         $feed = $playList->getFeed($playListId);
         if (!$feed) {
-            return $this->response->notFound();
+            return $this->getResponse()->notFound();
         }
 
-        return $this->response->view($feed)
+        return $this->getResponse()->view($feed)
             ->setHeader('Content-Type: text/xml');
     }
 
-    public function video(): Response
+    public function video(Request $request): Response
     {
-        $id = $this->getRequest()->get('id');
+        $id = $request->get('id');
         $videoInfo = new VideoInfo($id);
 
         try {
             $url = $videoInfo->getLink();
-            return $this->response
+            return $this->getResponse()
                 ->setHeader(header('Location: ' . $url));
         } catch (\RuntimeException $exception) {
-            return $this->response
+            return $this->getResponse()
                 ->view($exception->getMessage())
                 ->setHeader(header('HTTP/1.1 406 Not Acceptable'));
         }
     }
 
-    protected function getRequest(): Request
+    private function getResponse(): Response
     {
-        return Request::createFromGlobals();
+        return $this->getContainer()->get(Response::class);
     }
 }
