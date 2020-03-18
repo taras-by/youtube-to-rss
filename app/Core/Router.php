@@ -13,10 +13,11 @@ class Router
 
     /**
      * Router constructor.
+     * @param Request $request
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->request = Request::createFromGlobals();
+        $this->request = $request;
         @list($this->controller, $this->action) = explode('@', $this->getRoute(), 2);
     }
 

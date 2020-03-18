@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use App\Core\Response;
 use App\Services\FeedBuilder\Channel;
@@ -10,18 +11,15 @@ use App\Services\Generator\LinkGenerator;
 use App\Services\Validator\YoutubeLinkValidator;
 use App\Services\Youtube\VideoInfo;
 
-class HomeController
+class HomeController extends AbstractController
 {
-    private $response;
-
-    public function __construct(Response $response)
+    /**
+     * @param Request $request
+     * @param LinkGenerator $generator
+     * @return Response
+     */
+    public function index(Request $request, LinkGenerator $generator)
     {
-        $this->response = $response;
-    }
-
-    public function index(LinkGenerator $generator)
-    {
-        $request = $this->getRequest();
         $youtubeLink = $request->get('youtube_link');
         $submit = $request->isMethod(Request::METHOD_POST);
         $validator = new YoutubeLinkValidator($youtubeLink);
@@ -34,59 +32,76 @@ class HomeController
         } else {
             $errorMessage = $validator->getMessage();
         }
-        return $this->response->render('index', compact('youtubeLink', 'generatedUrl', 'errorMessage', 'submit'));
+        $content = $this->render('index', compact('youtubeLink', 'generatedUrl', 'errorMessage', 'submit'));
+        return $this->getResponse()->setBody($content);
     }
 
-    public function channel(Channel $channel): Response
+    /**
+     * @param Request $request
+     * @param Channel $channel
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function channel(Request $request, Channel $channel): Response
     {
-        $channelId = $this->getRequest()->get('id');
+        $channelId = $request->get('id');
         if (!$channelId) {
-            return $this->response->notFound();
+            throw new NotFoundHttpException('Empty ID parameter');
         }
 
         $feed = $channel->getFeed($channelId);
         if (!$feed) {
-            return $this->response->notFound();
+            throw new NotFoundHttpException('Channel not found');
         }
 
-        return $this->response->view($feed)
+        return $this->getResponse()->setBody($feed)
             ->setHeader('Content-Type: text/xml');
     }
 
-    public function playlist(Playlist $playList): Response
+    /**
+     * @param Request $request
+     * @param Playlist $playList
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function playlist(Request $request, Playlist $playList): Response
     {
-        $playListId = $this->getRequest()->get('id');
+        $playListId = $request->get('id');
         if (!$playListId) {
-            return $this->response->notFound();
+            throw new NotFoundHttpException('Empty ID parameter');
         }
 
         $feed = $playList->getFeed($playListId);
         if (!$feed) {
-            return $this->response->notFound();
+            throw new NotFoundHttpException('Playlist not found');
         }
 
-        return $this->response->view($feed)
+        return $this->getResponse()->setBody($feed)
             ->setHeader('Content-Type: text/xml');
     }
 
-    public function video(): Response
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws NotFoundHttpException
+     */
+    public function video(Request $request): Response
     {
-        $id = $this->getRequest()->get('id');
+        $id = $request->get('id');
+        if (!$id) {
+            throw new NotFoundHttpException('Empty ID parameter');
+        }
+
         $videoInfo = new VideoInfo($id);
 
         try {
             $url = $videoInfo->getLink();
-            return $this->response
+            return $this->getResponse()
                 ->setHeader(header('Location: ' . $url));
         } catch (\RuntimeException $exception) {
-            return $this->response
-                ->view($exception->getMessage())
+            return $this->getResponse()
+                ->setBody($exception->getMessage())
                 ->setHeader(header('HTTP/1.1 406 Not Acceptable'));
         }
-    }
-
-    protected function getRequest(): Request
-    {
-        return Request::createFromGlobals();
     }
 }
