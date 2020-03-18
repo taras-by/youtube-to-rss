@@ -3,8 +3,9 @@
 namespace App\Controllers;
 
 use App\Core\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use App\Core\Response;
+use Symfony\Component\HttpFoundation\Response;
 use App\Services\FeedBuilder\Channel;
 use App\Services\FeedBuilder\Playlist;
 use App\Services\Generator\LinkGenerator;
@@ -33,7 +34,7 @@ class HomeController extends AbstractController
             $errorMessage = $validator->getMessage();
         }
         $content = $this->render('index', compact('youtubeLink', 'generatedUrl', 'errorMessage', 'submit'));
-        return $this->getResponse()->setBody($content);
+        return new Response($content);
     }
 
     /**
@@ -54,8 +55,7 @@ class HomeController extends AbstractController
             throw new NotFoundHttpException('Channel not found');
         }
 
-        return $this->getResponse()->setBody($feed)
-            ->setHeader('Content-Type: text/xml');
+        return new Response($feed, Response::HTTP_OK, ['Content-Type' => 'xml']);
     }
 
     /**
@@ -76,8 +76,7 @@ class HomeController extends AbstractController
             throw new NotFoundHttpException('Playlist not found');
         }
 
-        return $this->getResponse()->setBody($feed)
-            ->setHeader('Content-Type: text/xml');
+        return new Response($feed, Response::HTTP_OK, ['Content-Type' => 'xml']);
     }
 
     /**
@@ -96,12 +95,9 @@ class HomeController extends AbstractController
 
         try {
             $url = $videoInfo->getLink();
-            return $this->getResponse()
-                ->setHeader(header('Location: ' . $url));
+            return new RedirectResponse($url);
         } catch (\RuntimeException $exception) {
-            return $this->getResponse()
-                ->setBody($exception->getMessage())
-                ->setHeader(header('HTTP/1.1 406 Not Acceptable'));
+            return new Response($exception->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
     }
 }

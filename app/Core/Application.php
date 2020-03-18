@@ -6,23 +6,20 @@ use App\Controllers\AbstractController;
 use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Application
 {
     protected $container;
-    protected $request;
-    protected $response;
     protected $router;
     protected $view;
 
     public function __construct(
         Container $container,
-        Response $response,
         Router $router,
         View $view
     )
     {
-        $this->response = $response;
         $this->router = $router;
         $this->container = $container;
         $this->view = $view;
@@ -34,8 +31,7 @@ class Application
             $controllerClassName = $this->router->getController();
             $action = $this->router->getAction();
         } catch (\Exception $exception) {
-            $this->sendNotFound();
-            return;
+            $this->notFoundResponse()->send();
         }
 
         try {
@@ -43,46 +39,31 @@ class Application
             $controllerObject = $this->container->get($controllerClassName);
             $controllerObject->setContainer($this->container);
             $response = $this->container->call([$controllerObject, $action]);
+            if (!$response instanceof Response) {
+                throw new \Exception('Required instance of Symfony\Component\HttpFoundation\Response');
+            }
         } catch (DependencyException $e) {
-            $this->sendNotFound($e->getMessage());
-            return;
+            $response = $this->notFoundResponse($e->getMessage());
         } catch (NotFoundException $e) {
-            $this->sendNotFound($e->getMessage());
-            return;
+            $response = $this->notFoundResponse($e->getMessage());
         } catch (NotFoundHttpException $e) {
-            $this->sendNotFound($e->getMessage());
-            return;
+            $response = $this->notFoundResponse($e->getMessage());
         } catch (\Throwable $e) {
-            $this->sendError($e);
-            return;
+            $response = $this->errorResponse($e);
         }
 
-        if ($response instanceof Response) {
-            $response->send();
-        }
-    }
-
-    private function sendNotFound(string $message = null)
-    {
-        $this->notFoundResponse($message)->send();
+        $response->send();
     }
 
     public function notFoundResponse(string $message = null): Response
     {
-        $this->response->setHeader('HTTP/1.0 404 Not Found');
         $content = $this->view->render('error.404', ['message' => $message]);
-        return $this->response->setBody($content);
-    }
-
-    private function sendError(\Throwable $exception)
-    {
-        $this->errorResponse($exception)->send();
+        return new Response($content, Response::HTTP_NOT_FOUND);
     }
 
     public function errorResponse(\Throwable $exception): Response
     {
-        $this->response->setHeader('HTTP/1.0 500 Internal Server Error');
         $content = $this->view->render('error.500', ['exception' => $exception]);
-        return $this->response->setBody($content);
+        return new Response($content, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
