@@ -3,7 +3,6 @@
 
 namespace App\Controllers;
 
-use App\Core\Response;
 use App\Core\View;
 use DI\Container;
 
@@ -37,10 +36,5 @@ abstract class AbstractController
         /** @var View $view */
         $view = $this->getContainer()->get(View::class);
         return $view->render($template, $params);
-    }
-
-    protected function getResponse(): Response
-    {
-        return $this->getContainer()->get(Response::class);
     }
 }

@@ -6,6 +6,7 @@ use App\Controllers\AbstractController;
 use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
+use Symfony\Component\HttpFoundation\Response;
 
 class Application
 {
@@ -38,6 +39,9 @@ class Application
             $controllerObject = $this->container->get($controllerClassName);
             $controllerObject->setContainer($this->container);
             $response = $this->container->call([$controllerObject, $action]);
+            if (!$response instanceof Response) {
+                throw new \Exception('Required instance of Symfony\Component\HttpFoundation\Response');
+            }
         } catch (DependencyException $e) {
             $response = $this->notFoundResponse($e->getMessage());
         } catch (NotFoundException $e) {
@@ -48,24 +52,18 @@ class Application
             $response = $this->errorResponse($e);
         }
 
-        if ($response instanceof Response) {
-            $response->send();
-        }
+        $response->send();
     }
 
     public function notFoundResponse(string $message = null): Response
     {
         $content = $this->view->render('error.404', ['message' => $message]);
-        return (new Response())
-            ->setHeader('HTTP/1.0 404 Not Found')
-            ->setBody($content);
+        return new Response($content, Response::HTTP_NOT_FOUND);
     }
 
     public function errorResponse(\Throwable $exception): Response
     {
         $content = $this->view->render('error.500', ['exception' => $exception]);
-        return (new Response())
-            ->setHeader('HTTP/1.0 500 Internal Server Error')
-            ->setBody($content);
+        return new Response($content, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
