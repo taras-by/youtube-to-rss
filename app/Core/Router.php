@@ -2,7 +2,6 @@
 
 namespace App\Core;
 
-use App\Route;
 use Symfony\Component\HttpFoundation\Request;
 
 class Router
@@ -10,15 +9,18 @@ class Router
     private $request;
     private $controller;
     private $action;
+    private $routes;
 
     /**
      * Router constructor.
      * @param Request $request
+     * @param array $routes
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, array $routes)
     {
+        $this->routes = $routes;
         $this->request = $request;
-        @list($this->controller, $this->action) = explode('@', $this->getRoute(), 2);
+        @list($this->controller, $this->action) = explode('::', $this->getRoute(), 2);
     }
 
     /**
@@ -26,12 +28,12 @@ class Router
      */
     public function getRoute()
     {
-        return Route::rules()[$this->request->getPathInfo()] ?? null;
+        return $this->routes[$this->request->getPathInfo()] ?? null;
     }
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws NotFoundHttpException
      */
     public function getController()
     {
@@ -40,20 +42,20 @@ class Router
         if ($this->controller && class_exists($controller)) {
             return $controller;
         } else {
-            throw new \Exception();
+            throw new NotFoundHttpException();
         }
     }
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws NotFoundHttpException
      */
     public function getAction()
     {
         if ($this->action && method_exists($this->getController(), $this->action)) {
             return $this->action;
         } else {
-            throw new \Exception();
+            throw new NotFoundHttpException();
         }
     }
 

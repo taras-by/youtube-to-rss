@@ -3,11 +3,11 @@
 namespace App\Services\FeedBuilder;
 
 use App\Core\Router;
-use App\Services\Youtube\Google;
 use App\Services\RssWriter\RssChannel;
 use App\Services\RssWriter\RssHelper;
 use App\Services\RssWriter\RssItem;
 use App\Services\Youtube\YoutubeHelper;
+use Google_Service_YouTube;
 
 /**
  * https://developers.google.com/youtube/v3/docs/channels/list
@@ -19,9 +19,9 @@ class Channel extends FeedAbstract
 
     protected $youtube;
 
-    public function __construct(Google $google)
+    public function __construct(Google_Service_YouTube $youtube)
     {
-        $this->youtube = new \Google_Service_YouTube($google->getClient());
+        $this->youtube = $youtube;
     }
 
     protected function getItems(string $id): array

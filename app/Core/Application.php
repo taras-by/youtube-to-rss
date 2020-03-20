@@ -30,11 +30,6 @@ class Application
         try {
             $controllerClassName = $this->router->getController();
             $action = $this->router->getAction();
-        } catch (\Exception $exception) {
-            $this->notFoundResponse()->send();
-        }
-
-        try {
             /** @var AbstractController $controllerObject */
             $controllerObject = $this->container->get($controllerClassName);
             $controllerObject->setContainer($this->container);

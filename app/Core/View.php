@@ -4,27 +4,38 @@ namespace App\Core;
 
 class View
 {
-    const LAYOUT_FILE = 'layout.php';
+    /**
+     * @var array
+     */
+    private $config;
+
+    public function __construct(array $config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * @param $template
      * @param array $params
      * @return string
      */
-    public function render($template, $params = []): string
+    public function render(string $template, array $params = []): string
     {
-        $template_path = VIEWS .
-            str_replace('.', '/', $template) . '.php';
-
         extract($params);
 
         ob_start();
-        include $template_path;
+        include $this->getTemplatePath($template);
         $content =  ob_get_clean();
 
         ob_start();
-        include VIEWS . self::LAYOUT_FILE;
+        include $this->getTemplatePath($this->config['layout']);
         $body = ob_get_clean();
 
         return $body;
+    }
+
+    private function getTemplatePath(string $template)
+    {
+        return $this->config['views_path'] . str_replace('.', '/', $template) . '.php';
     }
 }
