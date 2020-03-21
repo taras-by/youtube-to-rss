@@ -3,10 +3,12 @@
 use App\Core\Router;
 use App\Core\View;
 use DI\ContainerBuilder;
+use Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 
 require_once ROOT . 'vendor/autoload.php';
-require_once ROOT . 'app/env.php';
+
+Dotenv::createImmutable(ROOT)->load();
 $config = require_once ROOT . 'app/config.php';
 
 $builder = new ContainerBuilder();

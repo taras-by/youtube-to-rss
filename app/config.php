@@ -3,8 +3,8 @@
 return [
 
     'google' => [
-        'application_name' => GOOGLE_APPLICATION_NAME,
-        'developer_key' => GOOGLE_DEVELOPER_KEY,
+        'application_name' => getenv('GOOGLE_APPLICATION_NAME'),
+        'developer_key' => getenv('GOOGLE_DEVELOPER_KEY'),
     ],
 
     'views' => [
