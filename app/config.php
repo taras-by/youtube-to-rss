@@ -13,9 +13,21 @@ return [
     ],
 
     'routes' => [
-        '/' => 'HomeController::index',
-        '/channel.xml' => 'HomeController::channel',
-        '/playlist.xml' => 'HomeController::playlist',
-        '/video' => 'HomeController::video',
+        'index' => [
+            'route' => '#^/$#',
+            'action' => 'HomeController::index',
+        ],
+        'channel' => [
+            'route' => '#^/channel/(?<channelId>.+).xml$#',
+            'action' => 'HomeController::channel',
+        ],
+        'playlist' => [
+            'route' => '#^/playlist/(?<playlistId>.+).xml$#',
+            'action' => 'HomeController::playlist',
+        ],
+        'video' => [
+            'route' => '#^/video/(?<videoId>.+)$#',
+            'action' => 'HomeController::video',
+        ],
     ]
 ];

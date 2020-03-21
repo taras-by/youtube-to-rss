@@ -28,7 +28,7 @@ class LinkGenerator
         if (!$id = $this->getQueryParam($url, 'v')) {
             return null;
         }
-        return Router::url('video', ['id' => $id]);
+        return Router::url(sprintf('video/%s', $id));
     }
 
     private function getPlaylistLink(string $url)
@@ -36,7 +36,7 @@ class LinkGenerator
         if (!$id = $this->getQueryParam($url, 'list')) {
             return null;
         }
-        return Router::url('playlist.xml', ['id' => $id]);
+        return Router::url(sprintf('playlist/%s.xml', $id));
     }
 
     private function getChannelLink(string $url)
@@ -44,7 +44,7 @@ class LinkGenerator
         if (!$id = explode('channel/', $url)[1] ?? null) {
             return null;
         }
-        return Router::url('channel.xml', ['id' => $id]);
+        return Router::url(sprintf('channel/%s.xml', $id));
     }
 
     private function getQueryParam(string $url, string $name): ?string

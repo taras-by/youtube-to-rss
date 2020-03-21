@@ -51,7 +51,7 @@ class Playlist extends FeedAbstract
                         $image
                     ))
                     ->setPubDate(new \DateTime($video->snippet->publishedAt))
-                    ->setEnclosure(Router::url('video', ['id' => $videoId]))
+                    ->setEnclosure(Router::url(sprintf('video/%s', $videoId)))
                     ->setImage($image);
 
                 $items[] = $item;

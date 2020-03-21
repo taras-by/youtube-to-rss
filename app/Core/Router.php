@@ -6,10 +6,35 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Router
 {
+    /**
+     * @var Request
+     */
     private $request;
-    private $controller;
+
+    /**
+     * @var string
+     */
+    private $controllerClassName;
+
+    /**
+     * @var string
+     */
     private $action;
+
+    /**
+     * @var array
+     */
     private $routes;
+
+    /**
+     * @var array
+     */
+    private $route;
+
+    /**
+     * @var array
+     */
+    private $params;
 
     /**
      * Router constructor.
@@ -20,43 +45,63 @@ class Router
     {
         $this->routes = $routes;
         $this->request = $request;
-        @list($this->controller, $this->action) = explode('::', $this->getRoute(), 2);
     }
 
     /**
-     * @return string|null
-     */
-    public function getRoute()
-    {
-        return $this->routes[$this->request->getPathInfo()] ?? null;
-    }
-
-    /**
-     * @return string
      * @throws NotFoundHttpException
      */
-    public function getController()
+    public function resolve()
     {
-        $controller = 'App\Controllers\\' . $this->controller;
+        foreach ($this->routes as $route) {
+            if (preg_match($route['route'], $this->request->getPathInfo(), $matches)) {
+                $this->route = $route;
 
-        if ($this->controller && class_exists($controller)) {
-            return $controller;
-        } else {
+                $this->params = array_filter($matches, function ($key){
+                    return is_string($key);
+                }, ARRAY_FILTER_USE_KEY);
+
+                break;
+            }
+        }
+
+        if ($this->route == null) {
+            throw new NotFoundHttpException();
+        }
+
+        @list($controller, $this->action) = explode('::', $this->route['action'], 2);
+
+        $this->controllerClassName = sprintf('App\Controllers\\%s', $controller);
+        if (!class_exists($this->controllerClassName)) {
+            throw new NotFoundHttpException();
+        }
+
+        if (!method_exists($this->controllerClassName, $this->action)) {
             throw new NotFoundHttpException();
         }
     }
 
     /**
      * @return string
-     * @throws NotFoundHttpException
      */
-    public function getAction()
+    public function getControllerClassName(): string
     {
-        if ($this->action && method_exists($this->getController(), $this->action)) {
-            return $this->action;
-        } else {
-            throw new NotFoundHttpException();
-        }
+        return $this->controllerClassName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getParams(): ?array
+    {
+        return $this->params;
     }
 
     /**

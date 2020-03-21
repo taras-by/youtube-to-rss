@@ -38,18 +38,13 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @param Request $request
+     * @param string $channelId
      * @param Channel $channel
      * @return Response
      * @throws NotFoundHttpException
      */
-    public function channel(Request $request, Channel $channel): Response
+    public function channel(string $channelId, Channel $channel): Response
     {
-        $channelId = $request->get('id');
-        if (!$channelId) {
-            throw new NotFoundHttpException('Empty ID parameter');
-        }
-
         $feed = $channel->getFeed($channelId);
         if (!$feed) {
             throw new NotFoundHttpException('Channel not found');
@@ -59,18 +54,13 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @param Request $request
+     * @param string $playListId
      * @param Playlist $playList
      * @return Response
      * @throws NotFoundHttpException
      */
-    public function playlist(Request $request, Playlist $playList): Response
+    public function playlist(string $playListId, Playlist $playList): Response
     {
-        $playListId = $request->get('id');
-        if (!$playListId) {
-            throw new NotFoundHttpException('Empty ID parameter');
-        }
-
         $feed = $playList->getFeed($playListId);
         if (!$feed) {
             throw new NotFoundHttpException('Playlist not found');
@@ -80,18 +70,12 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @param Request $request
+     * @param string $videoId
      * @return Response
-     * @throws NotFoundHttpException
      */
-    public function video(Request $request): Response
+    public function video(string $videoId): Response
     {
-        $id = $request->get('id');
-        if (!$id) {
-            throw new NotFoundHttpException('Empty ID parameter');
-        }
-
-        $videoInfo = new VideoInfo($id);
+        $videoInfo = new VideoInfo($videoId);
 
         try {
             $url = $videoInfo->getLink();
