@@ -14,19 +14,19 @@ return [
 
     'routes' => [
         'index' => [
-            'route' => '#^/$#',
+            'route' => '/',
             'action' => 'HomeController::index',
         ],
         'channel' => [
-            'route' => '#^/channel/(?<channelId>.+).xml$#',
+            'route' => '/channel/{channelId}.xml',
             'action' => 'HomeController::channel',
         ],
         'playlist' => [
-            'route' => '#^/playlist/(?<playlistId>.+).xml$#',
+            'route' => '/playlist/{playlistId}.xml',
             'action' => 'HomeController::playlist',
         ],
         'video' => [
-            'route' => '#^/video/(?<videoId>.+)$#',
+            'route' => '/video/{videoId}',
             'action' => 'HomeController::video',
         ],
     ]

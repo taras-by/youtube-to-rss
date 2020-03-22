@@ -3,9 +3,29 @@
 namespace App\Services\Generator;
 
 use App\Core\Router;
+use Exception;
 
 class LinkGenerator
 {
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * LinkGenerator constructor.
+     * @param Router $router
+     */
+    public function __construct(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param string $youtubeUrl
+     * @return string|null
+     * @throws Exception
+     */
     public function generate(string $youtubeUrl): ?string
     {
         if (stripos($youtubeUrl, 'youtube.com/watch') !== false) {
@@ -23,28 +43,43 @@ class LinkGenerator
         return null;
     }
 
+    /**
+     * @param string $url
+     * @return string|null
+     * @throws Exception
+     */
     private function getVideoLink(string $url)
     {
         if (!$id = $this->getQueryParam($url, 'v')) {
             return null;
         }
-        return Router::url(sprintf('video/%s', $id));
+        return $this->router->url('video', ['videoId' => $id]);
     }
 
+    /**
+     * @param string $url
+     * @return string|null
+     * @throws Exception
+     */
     private function getPlaylistLink(string $url)
     {
         if (!$id = $this->getQueryParam($url, 'list')) {
             return null;
         }
-        return Router::url(sprintf('playlist/%s.xml', $id));
+        return $this->router->url('playlist', ['playlistId' => $id]);
     }
 
+    /**
+     * @param string $url
+     * @return string|null
+     * @throws Exception
+     */
     private function getChannelLink(string $url)
     {
         if (!$id = explode('channel/', $url)[1] ?? null) {
             return null;
         }
-        return Router::url(sprintf('channel/%s.xml', $id));
+        return $this->router->url('channel', ['channelId' => $id]);
     }
 
     private function getQueryParam(string $url, string $name): ?string

@@ -7,6 +7,7 @@ use App\Services\RssWriter\RssChannel;
 use App\Services\RssWriter\RssHelper;
 use App\Services\RssWriter\RssItem;
 use App\Services\Youtube\YoutubeHelper;
+use Exception;
 use Google_Service_YouTube;
 
 /**
@@ -16,15 +17,29 @@ use Google_Service_YouTube;
 class Playlist extends FeedAbstract
 {
     const MAX_RESULTS = 50;
-    const PLAYLIST_IMAGE = 'images/youtube.png';
+    const PLAYLIST_IMAGE = '/images/youtube.png';
 
+    /**
+     * @var Google_Service_YouTube
+     */
     protected $youtube;
 
-    public function __construct(Google_Service_YouTube $youtube)
+    /**
+     * @var Router
+     */
+    private $router;
+
+    public function __construct(Google_Service_YouTube $youtube, Router $router)
     {
         $this->youtube = $youtube;
+        $this->router = $router;
     }
 
+    /**
+     * @param string $id
+     * @return array
+     * @throws Exception
+     */
     protected function getItems(string $id): array
     {
         $playlistItems = $this->youtube->playlistItems->listPlaylistItems('snippet', [
@@ -51,7 +66,7 @@ class Playlist extends FeedAbstract
                         $image
                     ))
                     ->setPubDate(new \DateTime($video->snippet->publishedAt))
-                    ->setEnclosure(Router::url(sprintf('video/%s', $videoId)))
+                    ->setEnclosure($this->router->url('video', ['videoId' => $id]))
                     ->setImage($image);
 
                 $items[] = $item;
@@ -76,6 +91,6 @@ class Playlist extends FeedAbstract
         return $channel->setTitle($list->snippet->title)
             ->setDescription($list->snippet->description)
             ->setLink(YoutubeHelper::getPlayListUrl($list->id))
-            ->setImage(Router::url(self::PLAYLIST_IMAGE));
+            ->setImage($this->router->getUriForPath(self::PLAYLIST_IMAGE));
     }
 }

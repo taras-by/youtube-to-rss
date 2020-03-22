@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 
 class Router
@@ -52,11 +53,16 @@ class Router
      */
     public function resolve()
     {
+        $paramPattern = '#{(\w+)}#';
+        $paramReplacement = '(?<$1>.+)';
+
         foreach ($this->routes as $route) {
-            if (preg_match($route['route'], $this->request->getPathInfo(), $matches)) {
+            $rotePattern = '#^' . preg_replace($paramPattern, $paramReplacement, $route['route']) . '$#';
+
+            if (preg_match($rotePattern, $this->request->getPathInfo(), $matches)) {
                 $this->route = $route;
 
-                $this->params = array_filter($matches, function ($key){
+                $this->params = array_filter($matches, function ($key) {
                     return is_string($key);
                 }, ARRAY_FILTER_USE_KEY);
 
@@ -78,6 +84,44 @@ class Router
         if (!method_exists($this->controllerClassName, $this->action)) {
             throw new NotFoundHttpException();
         }
+    }
+
+    /**
+     * @param string $routeName
+     * @param array $params
+     * @return string
+     * @throws Exception
+     */
+    public function url(string $routeName, array $params): string
+    {
+        $paramPatterns = [];
+        $paramReplacements = [];
+        $queryParams = [];
+
+        if (!$route = $this->findRoute($routeName)) {
+            throw new Exception('Route not found');
+        }
+
+        foreach ($params as $name => $value) {
+            $paramPattern = '{' . $name . '}';
+            if (stripos($route['route'], $paramPattern) !== false) {
+                $paramPatterns[] = '#' . $paramPattern . '#';
+                $paramReplacements[] = $value;
+            } else {
+                $queryParams[$name] = $value;
+            }
+        }
+
+        $query = $queryParams ? '?' . http_build_query($queryParams) : '';
+
+        $urlPath = preg_replace($paramPatterns, $paramReplacements, $route['route']) . $query;
+
+        return $this->request->getUriForPath($urlPath);
+    }
+
+    public function getUriForPath(string $urlPath): string
+    {
+        return $this->request->getUriForPath($urlPath);
     }
 
     /**
@@ -105,15 +149,11 @@ class Router
     }
 
     /**
-     * @param string $path
-     * @param array $parameters
-     * @return string
+     * @param string $routeName
+     * @return array
      */
-    static public function url(string $path, array $parameters = []): string
+    public function findRoute(string $routeName): array
     {
-        return $_SERVER['REQUEST_SCHEME'] .
-            '://' . $_SERVER['HTTP_HOST'] .
-            '/' . $path .
-            ($parameters ? '?' . http_build_query($parameters) : '');
+        return $this->routes[$routeName];
     }
 }
