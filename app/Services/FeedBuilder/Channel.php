@@ -67,7 +67,7 @@ class Channel extends FeedAbstract
                         $image
                     ))
                     ->setPubDate(new \DateTime($video->snippet->publishedAt))
-                    ->setEnclosure($this->router->url('video', ['videoId' => $id]))
+                    ->setEnclosure($this->router->url('video', ['videoId' => $videoId]))
                     ->setImage($image);
 
                 $items[] = $item;
