@@ -3,11 +3,12 @@
 namespace App\Services\FeedBuilder;
 
 use App\Core\Router;
-use App\Services\Youtube\Google;
 use App\Services\RssWriter\RssChannel;
 use App\Services\RssWriter\RssHelper;
 use App\Services\RssWriter\RssItem;
 use App\Services\Youtube\YoutubeHelper;
+use Exception;
+use Google_Service_YouTube;
 
 /**
  * https://developers.google.com/youtube/v3/docs/channels/list
@@ -17,13 +18,27 @@ class Channel extends FeedAbstract
 {
     const MAX_RESULTS = 50;
 
+    /**
+     * @var Google_Service_YouTube
+     */
     protected $youtube;
 
-    public function __construct(Google $google)
+    /**
+     * @var Router
+     */
+    private $router;
+
+    public function __construct(Google_Service_YouTube $youtube, Router $router)
     {
-        $this->youtube = new \Google_Service_YouTube($google->getClient());
+        $this->youtube = $youtube;
+        $this->router = $router;
     }
 
+    /**
+     * @param string $id
+     * @return array
+     * @throws Exception
+     */
     protected function getItems(string $id): array
     {
         $listSearch = $this->youtube->search->listSearch('snippet', [
@@ -52,7 +67,7 @@ class Channel extends FeedAbstract
                         $image
                     ))
                     ->setPubDate(new \DateTime($video->snippet->publishedAt))
-                    ->setEnclosure(Router::url('video', ['id' => $videoId]))
+                    ->setEnclosure($this->router->url('video', ['videoId' => $id]))
                     ->setImage($image);
 
                 $items[] = $item;

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\NotFoundHttpException;
+use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,7 @@ class HomeController extends AbstractController
      * @param Request $request
      * @param LinkGenerator $generator
      * @return Response
+     * @throws Exception
      */
     public function index(Request $request, LinkGenerator $generator)
     {
@@ -38,60 +40,40 @@ class HomeController extends AbstractController
     }
 
     /**
-     * @param Request $request
+     * @param string $channelId
      * @param Channel $channel
      * @return Response
      * @throws NotFoundHttpException
      */
-    public function channel(Request $request, Channel $channel): Response
+    public function channel(string $channelId, Channel $channel): Response
     {
-        $channelId = $request->get('id');
-        if (!$channelId) {
-            throw new NotFoundHttpException('Empty ID parameter');
-        }
-
-        $feed = $channel->getFeed($channelId);
-        if (!$feed) {
+        if (!$feed = $channel->getFeed($channelId)) {
             throw new NotFoundHttpException('Channel not found');
         }
-
         return new Response($feed, Response::HTTP_OK, ['Content-Type' => 'xml']);
     }
 
     /**
-     * @param Request $request
+     * @param string $playlistId
      * @param Playlist $playList
      * @return Response
      * @throws NotFoundHttpException
      */
-    public function playlist(Request $request, Playlist $playList): Response
+    public function playlist(string $playlistId, Playlist $playList): Response
     {
-        $playListId = $request->get('id');
-        if (!$playListId) {
-            throw new NotFoundHttpException('Empty ID parameter');
-        }
-
-        $feed = $playList->getFeed($playListId);
-        if (!$feed) {
+        if (!$feed = $playList->getFeed($playlistId)) {
             throw new NotFoundHttpException('Playlist not found');
         }
-
         return new Response($feed, Response::HTTP_OK, ['Content-Type' => 'xml']);
     }
 
     /**
-     * @param Request $request
+     * @param string $videoId
      * @return Response
-     * @throws NotFoundHttpException
      */
-    public function video(Request $request): Response
+    public function video(string $videoId): Response
     {
-        $id = $request->get('id');
-        if (!$id) {
-            throw new NotFoundHttpException('Empty ID parameter');
-        }
-
-        $videoInfo = new VideoInfo($id);
+        $videoInfo = new VideoInfo($videoId);
 
         try {
             $url = $videoInfo->getLink();

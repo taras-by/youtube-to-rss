@@ -2,71 +2,158 @@
 
 namespace App\Core;
 
-use App\Route;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 
 class Router
 {
+    /**
+     * @var Request
+     */
     private $request;
-    private $controller;
+
+    /**
+     * @var string
+     */
+    private $controllerClassName;
+
+    /**
+     * @var string
+     */
     private $action;
+
+    /**
+     * @var array
+     */
+    private $routes;
+
+    /**
+     * @var array
+     */
+    private $route;
+
+    /**
+     * @var array
+     */
+    private $params;
 
     /**
      * Router constructor.
      * @param Request $request
+     * @param array $routes
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, array $routes)
     {
+        $this->routes = $routes;
         $this->request = $request;
-        @list($this->controller, $this->action) = explode('@', $this->getRoute(), 2);
     }
 
     /**
-     * @return string|null
+     * @throws NotFoundHttpException
      */
-    public function getRoute()
+    public function resolve()
     {
-        return Route::rules()[$this->request->getPathInfo()] ?? null;
-    }
+        $paramPattern = '#{(\w+)}#';
+        $paramReplacement = '(?<$1>.+)';
 
-    /**
-     * @return string
-     * @throws \Exception
-     */
-    public function getController()
-    {
-        $controller = 'App\Controllers\\' . $this->controller;
+        foreach ($this->routes as $route) {
+            $rotePattern = '#^' . preg_replace($paramPattern, $paramReplacement, $route['route']) . '$#';
 
-        if ($this->controller && class_exists($controller)) {
-            return $controller;
-        } else {
-            throw new \Exception();
+            if (preg_match($rotePattern, $this->request->getPathInfo(), $matches)) {
+                $this->route = $route;
+
+                $this->params = array_filter($matches, function ($key) {
+                    return is_string($key);
+                }, ARRAY_FILTER_USE_KEY);
+
+                break;
+            }
+        }
+
+        if ($this->route == null) {
+            throw new NotFoundHttpException();
+        }
+
+        @list($controller, $this->action) = explode('::', $this->route['action'], 2);
+
+        $this->controllerClassName = sprintf('App\Controllers\\%s', $controller);
+        if (!class_exists($this->controllerClassName)) {
+            throw new NotFoundHttpException();
+        }
+
+        if (!method_exists($this->controllerClassName, $this->action)) {
+            throw new NotFoundHttpException();
         }
     }
 
     /**
+     * @param string $routeName
+     * @param array $params
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getAction()
+    public function url(string $routeName, array $params): string
     {
-        if ($this->action && method_exists($this->getController(), $this->action)) {
-            return $this->action;
-        } else {
-            throw new \Exception();
+        $paramPatterns = [];
+        $paramReplacements = [];
+        $queryParams = [];
+
+        if (!$route = $this->findRoute($routeName)) {
+            throw new Exception('Route not found');
         }
+
+        foreach ($params as $name => $value) {
+            $paramPattern = '{' . $name . '}';
+            if (stripos($route['route'], $paramPattern) !== false) {
+                $paramPatterns[] = '#' . $paramPattern . '#';
+                $paramReplacements[] = $value;
+            } else {
+                $queryParams[$name] = $value;
+            }
+        }
+
+        $query = $queryParams ? '?' . http_build_query($queryParams) : '';
+
+        $urlPath = preg_replace($paramPatterns, $paramReplacements, $route['route']) . $query;
+
+        return $this->request->getUriForPath($urlPath);
+    }
+
+    public function getUriForPath(string $urlPath): string
+    {
+        return $this->request->getUriForPath($urlPath);
     }
 
     /**
-     * @param string $path
-     * @param array $parameters
      * @return string
      */
-    static public function url(string $path, array $parameters = []): string
+    public function getControllerClassName(): string
     {
-        return $_SERVER['REQUEST_SCHEME'] .
-            '://' . $_SERVER['HTTP_HOST'] .
-            '/' . $path .
-            ($parameters ? '?' . http_build_query($parameters) : '');
+        return $this->controllerClassName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction(): string
+    {
+        return $this->action;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getParams(): ?array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param string $routeName
+     * @return array
+     */
+    public function findRoute(string $routeName): array
+    {
+        return $this->routes[$routeName];
     }
 }

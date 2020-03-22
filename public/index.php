@@ -1,9 +1,12 @@
 <?php
 
-$container = require_once __DIR__ . '/../app/bootstrap.php';
+use App\Core\Application;
+
+define('ROOT', realpath(__DIR__ . '/..') . '/');
+$container = require_once ROOT . 'app/bootstrap.php';
 
 /**
- * @var \App\Core\Application $app
+ * @var Application $app
  */
-$app = $container->get('App\Core\Application');
+$app = $container->get(Application::class);
 $app->run();

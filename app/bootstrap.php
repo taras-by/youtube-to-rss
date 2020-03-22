@@ -1,19 +1,24 @@
 <?php
 
+use App\Core\Router;
+use App\Core\View;
 use DI\ContainerBuilder;
+use Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
-use function DI\factory;
 
-define('ROOT', realpath(__DIR__ . '/..') . '/');
-define('APP', ROOT . 'app/');
-define('VIEWS', APP . 'Views/');
+require_once ROOT . 'vendor/autoload.php';
 
-require_once ROOT . '/vendor/autoload.php';
+Dotenv::createImmutable(ROOT)->load();
+$config = require_once ROOT . 'app/config.php';
 
 $builder = new ContainerBuilder();
 
 $builder->addDefinitions([
-    Request::class => factory([Request::class, 'createFromGlobals']),
+    Request::class => DI\factory([Request::class, 'createFromGlobals']),
+    Router::class => DI\create()->constructor(DI\get(Request::class), $config['routes']),
+    View::class => DI\create()->constructor($config['views']),
+    Google_Client::class => DI\create()->constructor($config['google']),
+    Google_Service_YouTube::class => DI\create()->constructor(DI\get(Google_Client::class)),
 ]);
 
 return $builder->build();

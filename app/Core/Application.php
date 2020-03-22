@@ -28,17 +28,12 @@ class Application
     public function run()
     {
         try {
-            $controllerClassName = $this->router->getController();
-            $action = $this->router->getAction();
-        } catch (\Exception $exception) {
-            $this->notFoundResponse()->send();
-        }
+            $this->router->resolve();
 
-        try {
             /** @var AbstractController $controllerObject */
-            $controllerObject = $this->container->get($controllerClassName);
-            $controllerObject->setContainer($this->container);
-            $response = $this->container->call([$controllerObject, $action]);
+            $controllerObject = $this->container->get($this->router->getControllerClassName())
+                ->setContainer($this->container);
+            $response = $this->container->call([$controllerObject, $this->router->getAction()], $this->router->getParams());
             if (!$response instanceof Response) {
                 throw new \Exception('Required instance of Symfony\Component\HttpFoundation\Response');
             }
