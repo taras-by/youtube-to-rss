@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Youtube;
+namespace App\Helper;
 
 class YoutubeHelper
 {

@@ -76,7 +76,7 @@ class Router
 
         @list($controller, $this->action) = explode('::', $this->route['action'], 2);
 
-        $this->controllerClassName = sprintf('App\Controllers\\%s', $controller);
+        $this->controllerClassName = sprintf('App\Controller\\%s', $controller);
         if (!class_exists($this->controllerClassName)) {
             throw new NotFoundHttpException();
         }

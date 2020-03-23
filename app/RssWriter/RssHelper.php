@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\RssWriter;
+namespace App\RssWriter;
 
 class RssHelper
 {

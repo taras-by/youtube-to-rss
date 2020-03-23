@@ -1,9 +1,8 @@
 <?php
 
 
-namespace App\Controllers;
+namespace App\Core;
 
-use App\Core\View;
 use DI\Container;
 
 abstract class AbstractController

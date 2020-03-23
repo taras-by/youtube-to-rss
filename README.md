@@ -9,7 +9,7 @@ Installation, build/run containers:
     $ docker-compose up -d 
     $ ./docker/console composer install
     
-Edit config file: `app/Config.php`
+Edit config file: `.env`
 
 Run application: `http://localhost:835`
     
