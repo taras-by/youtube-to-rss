@@ -2,7 +2,9 @@
 
 namespace App\Model;
 
-class ListModel
+use App\Helper\YoutubeHelper;
+
+class ListItemModel
 {
     /**
      * @var string
@@ -20,27 +22,21 @@ class ListModel
     private $description;
 
     /**
+     * @var \DateTime
+     */
+    private $pubDate;
+
+    /**
      * @var string
      */
     private $image;
 
     /**
-     * @var string
-     */
-    private $link;
-
-    /**
-     * @var ListItemModel[]
-     */
-    private $items;
-
-    /**
-     * ListModel constructor.
+     * ListItemModel constructor.
      * @param string $id
      */
     public function __construct(string $id)
     {
-        $this->items = [];
         $this->id = $id;
     }
 
@@ -64,7 +60,7 @@ class ListModel
      * @param string $title
      * @return $this
      */
-    public function setTitle(string $title): ListModel
+    public function setTitle(string $title): ListItemModel
     {
         $this->title = $title;
 
@@ -80,6 +76,36 @@ class ListModel
     }
 
     /**
+     * @param string $description
+     * @return $this
+     */
+    public function setDescription(string $description): ListItemModel
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getPubDate(): \DateTime
+    {
+        return $this->pubDate;
+    }
+
+    /**
+     * @param \DateTime $pubDate
+     * @return $this
+     */
+    public function setPubDate(\DateTime $pubDate): ListItemModel
+    {
+        $this->pubDate = $pubDate;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getImage(): string
@@ -91,7 +117,7 @@ class ListModel
      * @param $image
      * @return $this
      */
-    public function setImage($image): ListModel
+    public function setImage($image): ListItemModel
     {
         $this->image = $image;
 
@@ -103,45 +129,6 @@ class ListModel
      */
     public function getLink(): string
     {
-        return $this->link;
-    }
-
-    /**
-     * @param string $link
-     * @return ListModel
-     */
-    public function setLink(string $link): self
-    {
-        $this->link = $link;
-        return $this;
-    }
-
-    /**
-     * @return ListItemModel[]
-     */
-    public function getItems(): array
-    {
-        return $this->items;
-    }
-
-    /**
-     * @param ListItemModel $item
-     * @return ListModel
-     */
-    public function addItem(ListItemModel $item): ListModel
-    {
-        $this->items[] = $item;
-        return $this;
-    }
-
-    /**
-     * @param string $description
-     * @return $this
-     */
-    public function setDescription(string $description): ListModel
-    {
-        $this->description = $description;
-
-        return $this;
+        return YoutubeHelper::getVideoUrl($this->getId());
     }
 }
