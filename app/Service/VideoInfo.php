@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Youtube;
+namespace App\Service;
 
 class VideoInfo
 {
@@ -18,12 +18,10 @@ class VideoInfo
 
     private $id;
     private $info;
-    private $decipher;
 
     public function __construct($id)
     {
         $this->id = $id;
-        $this->decipher = new SignatureDecipher($id);
     }
 
     public function getLink(string $quality = self::QUALITY_MEDIUM): string

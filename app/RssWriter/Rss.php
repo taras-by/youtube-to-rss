@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\RssWriter;
+namespace App\RssWriter;
 
 class Rss
 {
@@ -77,6 +77,13 @@ class Rss
     public function setItems(array $items): Rss
     {
         $this->items = $items;
+
+        return $this;
+    }
+
+    public function addItem(RssItem $item): Rss
+    {
+        $this->items[] = $item;
 
         return $this;
     }

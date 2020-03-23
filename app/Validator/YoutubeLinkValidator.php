@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Validator;
+namespace App\Validator;
 
 class YoutubeLinkValidator
 {

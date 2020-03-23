@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Generator;
+namespace App\Generator;
 
 use App\Core\Router;
 use Exception;

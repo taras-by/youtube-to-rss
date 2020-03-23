@@ -2,10 +2,7 @@
 
 namespace App\Core;
 
-use App\Controllers\AbstractController;
 use DI\Container;
-use DI\DependencyException;
-use DI\NotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 
 class Application
@@ -37,10 +34,6 @@ class Application
             if (!$response instanceof Response) {
                 throw new \Exception('Required instance of Symfony\Component\HttpFoundation\Response');
             }
-        } catch (DependencyException $e) {
-            $response = $this->notFoundResponse($e->getMessage());
-        } catch (NotFoundException $e) {
-            $response = $this->notFoundResponse($e->getMessage());
         } catch (NotFoundHttpException $e) {
             $response = $this->notFoundResponse($e->getMessage());
         } catch (\Throwable $e) {
