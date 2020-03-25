@@ -21,6 +21,11 @@ class FeedBuilderService
         $this->router = $router;
     }
 
+    /**
+     * @param ListModel $list
+     * @return string
+     * @throws \Exception
+     */
     public function getFeed(ListModel $list): string
     {
         $rssChannel = (new RssChannel())

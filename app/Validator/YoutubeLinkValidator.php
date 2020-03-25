@@ -4,6 +4,9 @@ namespace App\Validator;
 
 class YoutubeLinkValidator
 {
+    const LINK_PATTERN_PLAYLIST = '/youtube.com\/playlist.+list=(.+)/i';
+    const LINK_PATTERN_VIDEO = '/youtube.com\/watch.+v=(.+)/i';
+    const LINK_PATTERN_CHANNEL = '/youtube.com\/channel\/(.+)/i';
 
     /**
      * @var string|null
@@ -20,6 +23,21 @@ class YoutubeLinkValidator
         $this->link = $link;
     }
 
+    /**
+     * @return string[]
+     */
+    private function getPatterns()
+    {
+        return [
+            self::LINK_PATTERN_PLAYLIST,
+            self::LINK_PATTERN_CHANNEL,
+            self::LINK_PATTERN_VIDEO,
+        ];
+    }
+
+    /**
+     * @return bool
+     */
     public function validate()
     {
         if ($this->link == null) {
@@ -27,12 +45,14 @@ class YoutubeLinkValidator
             return false;
         }
 
-        if (stripos($this->link, 'youtube') === false) {
-            $this->message = 'Wrong link';
-            return false;
+        foreach ($this->getPatterns() as $pattern) {
+            if (preg_match($pattern, $this->link)) {
+                return true;
+            }
         }
 
-        return true;
+        $this->message = 'Invalid link format';
+        return false;
     }
 
     /**

@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Core\Router;
 use App\Model\ListItemModel;
 use App\Model\ListModel;
+use DateTime;
+use Exception;
 use Google_Service_YouTube;
 
 class YoutubeListService
@@ -27,6 +29,11 @@ class YoutubeListService
         $this->router = $router;
     }
 
+    /**
+     * @param string $channelId
+     * @return ListModel|null
+     * @throws Exception
+     */
     public function getChannel(string $channelId): ?ListModel
     {
         $items = $this->youtube->channels->listChannels('snippet', [
@@ -59,6 +66,11 @@ class YoutubeListService
         return $list;
     }
 
+    /**
+     * @param string $playlistId
+     * @return ListModel|null
+     * @throws Exception
+     */
     public function getPlaylist(string $playlistId): ?ListModel
     {
         $items = $this->youtube->playlists->listPlaylists('snippet', [
@@ -89,6 +101,10 @@ class YoutubeListService
         return $list;
     }
 
+    /**
+     * @param $listData
+     * @return ListModel|null
+     */
     private function createListWithMetaData($listData): ?ListModel
     {
         if (!$listData->snippet) {
@@ -105,6 +121,12 @@ class YoutubeListService
             );
     }
 
+    /**
+     * @param ListItemModel $listItem
+     * @param $itemData
+     * @return ListItemModel
+     * @throws Exception
+     */
     private function fillListItem(ListItemModel $listItem, $itemData)
     {
         $image = $video->snippet->thumbnails->standard->url ??
@@ -113,7 +135,7 @@ class YoutubeListService
         return $listItem
             ->setTitle($itemData->snippet->title)
             ->setDescription($itemData->snippet->description)
-            ->setPubDate(new \DateTime($itemData->snippet->publishedAt))
+            ->setPubDate(new DateTime($itemData->snippet->publishedAt))
             ->setImage($image);
     }
 }

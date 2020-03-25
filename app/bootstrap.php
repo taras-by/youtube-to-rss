@@ -1,5 +1,6 @@
 <?php
 
+use App\Core\Application;
 use App\Core\Router;
 use App\Core\View;
 use DI\ContainerBuilder;
@@ -21,4 +22,5 @@ $builder->addDefinitions([
     Google_Service_YouTube::class => DI\create()->constructor(DI\get(Google_Client::class)),
 ]);
 
-return $builder->build();
+$container = $builder->build();
+return $container->get(Application::class);

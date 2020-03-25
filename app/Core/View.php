@@ -34,7 +34,7 @@ class View
         return $body;
     }
 
-    private function getTemplatePath(string $template)
+    private function getTemplatePath(string $template): string
     {
         return $this->config['views_path'] . str_replace('.', '/', $template) . '.php';
     }

@@ -4,14 +4,7 @@ namespace App\Model;
 
 class VideoFormatModel
 {
-
-    /**
-     *
-     */
     const QUALITY_MEDIUM = 'medium';
-    /**
-     *
-     */
     const FORMAT_MP4 = 'mp4';
 
     /**

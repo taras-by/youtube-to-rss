@@ -2,6 +2,8 @@
 
 namespace App\RssWriter;
 
+use SimpleXMLElement;
+
 class Rss
 {
     const NAMESPACE_ITUNES = 'http://www.itunes.com/dtds/podcast-1.0.dtd';
@@ -9,7 +11,7 @@ class Rss
     const NAMESPACE_CONTENT = 'http://purl.org/rss/1.0/modules/content/';
 
     /**
-     * @var \SimpleXMLElement
+     * @var SimpleXMLElement
      */
     private $rss;
 
@@ -17,11 +19,17 @@ class Rss
      * @var RssChannel
      */
     private $channel;
+    /**
+     * @var RssItem[]
+     */
     private $items = [];
 
+    /**
+     * Rss constructor.
+     */
     public function __construct()
     {
-        $this->rss = new \SimpleXMLElement(
+        $this->rss = new SimpleXMLElement(
             '<rss ' .
             'xmlns:content="' . self::NAMESPACE_CONTENT . '" ' .
             'xmlns:atom="' . self::NAMESPACE_ATOM . '" ' .
@@ -61,12 +69,19 @@ class Rss
         }
     }
 
+    /**
+     * @return string
+     */
     public function getAsString(): string
     {
         $this->build();
         return $this->rss->asXML();
     }
 
+    /**
+     * @param RssChannel $channel
+     * @return $this
+     */
     public function setChannel(RssChannel $channel): Rss
     {
         $this->channel = $channel;
@@ -74,6 +89,10 @@ class Rss
         return $this;
     }
 
+    /**
+     * @param RssItem[] $items
+     * @return $this
+     */
     public function setItems(array $items): Rss
     {
         $this->items = $items;
@@ -81,6 +100,10 @@ class Rss
         return $this;
     }
 
+    /**
+     * @param RssItem $item
+     * @return $this
+     */
     public function addItem(RssItem $item): Rss
     {
         $this->items[] = $item;

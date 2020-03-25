@@ -6,6 +6,7 @@ use App\Core\AbstractController;
 use App\Core\NotFoundHttpException;
 use App\Service\FeedBuilderService;
 use App\Service\YoutubeListService;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 class FeedController extends AbstractController
@@ -16,6 +17,7 @@ class FeedController extends AbstractController
      * @param FeedBuilderService $feedBuilderService
      * @return Response
      * @throws NotFoundHttpException
+     * @throws Exception
      */
     public function channel(string $channelId, YoutubeListService $youtubeService, FeedBuilderService $feedBuilderService): Response
     {
@@ -32,6 +34,7 @@ class FeedController extends AbstractController
      * @param FeedBuilderService $feedBuilderService
      * @return Response
      * @throws NotFoundHttpException
+     * @throws Exception
      */
     public function playlist(string $playlistId, YoutubeListService $youtubeService, FeedBuilderService $feedBuilderService): Response
     {
