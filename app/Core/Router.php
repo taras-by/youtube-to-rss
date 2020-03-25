@@ -119,6 +119,10 @@ class Router
         return $this->request->getUriForPath($urlPath);
     }
 
+    /**
+     * @param string $urlPath
+     * @return string
+     */
     public function getUriForPath(string $urlPath): string
     {
         return $this->request->getUriForPath($urlPath);

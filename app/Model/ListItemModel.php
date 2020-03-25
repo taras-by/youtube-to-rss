@@ -3,6 +3,7 @@
 namespace App\Model;
 
 use App\Helper\YoutubeHelper;
+use DateTime;
 
 class ListItemModel
 {
@@ -22,7 +23,7 @@ class ListItemModel
     private $description;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     private $pubDate;
 
@@ -87,18 +88,18 @@ class ListItemModel
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getPubDate(): \DateTime
+    public function getPubDate(): DateTime
     {
         return $this->pubDate;
     }
 
     /**
-     * @param \DateTime $pubDate
+     * @param DateTime $pubDate
      * @return $this
      */
-    public function setPubDate(\DateTime $pubDate): ListItemModel
+    public function setPubDate(DateTime $pubDate): ListItemModel
     {
         $this->pubDate = $pubDate;
 

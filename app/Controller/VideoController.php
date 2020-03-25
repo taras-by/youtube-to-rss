@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Core\AbstractController;
 use App\Service\YoutubeVideoService;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,10 +19,9 @@ class VideoController extends AbstractController
     {
         try {
             $video = $service->getVideoInfo($videoId);
-        } catch (\RuntimeException $exception) {
+        } catch (RuntimeException $exception) {
             return new Response($exception->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
-
         return new RedirectResponse($video->getMediumQualityFormat()->getUrl());
     }
 }

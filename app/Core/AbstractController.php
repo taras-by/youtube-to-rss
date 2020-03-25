@@ -1,9 +1,9 @@
 <?php
 
-
 namespace App\Core;
 
 use DI\Container;
+use Exception;
 
 abstract class AbstractController
 {
@@ -30,6 +30,12 @@ abstract class AbstractController
         return $this;
     }
 
+    /**
+     * @param string $template
+     * @param array $params
+     * @return string
+     * @throws Exception
+     */
     protected function render(string $template, array $params = []): string
     {
         /** @var View $view */

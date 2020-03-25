@@ -9,6 +9,9 @@ class VideoModel
      */
     private $formats;
 
+    /**
+     * VideoModel constructor.
+     */
     public function __construct()
     {
         $this->formats = [];
@@ -52,6 +55,9 @@ class VideoModel
         return $result;
     }
 
+    /**
+     * @return VideoFormatModel
+     */
     public function getMediumQualityFormat(): VideoFormatModel
     {
         return $this->getFormatByQuality(VideoFormatModel::QUALITY_MEDIUM);
